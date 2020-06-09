@@ -3,6 +3,8 @@ import 'package:revision_flutter/drawer.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:revision_flutter/utils/constants.dart';
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -25,12 +27,22 @@ class _HomePageState extends State<HomePage> {
   getData() async{
     var res= await http.get(url);
     data=jsonDecode(res.body);
+    setState(() {});
   }
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Awesome App"),),
+      appBar: AppBar(title: Text("Awesome App"),
+      actions: [
+        IconButton(onPressed: (){
+          Constants.prefs.setBool("loggedIn", false);
+          Navigator.pushReplacementNamed(context, "/login");
+        },
+        icon: Icon(Icons.exit_to_app),)
+      ],
+      ),
+      
       floatingActionButton: FloatingActionButton(
         onPressed: (){
           mytext=_namecontroller.text;
@@ -43,9 +55,10 @@ class _HomePageState extends State<HomePage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: data!=null?Card(
-          child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+          child: ListView.builder(
+            
             itemCount: data.length,
+            padding: EdgeInsets.all(8),
             itemBuilder: (BuildContext context, int index) {
             return ListTile(title: Text(data[index]["title"],),
                             leading: Image.network(data[index]["url"]),
@@ -53,8 +66,11 @@ class _HomePageState extends State<HomePage> {
             );
            },
           ),
-        ):Center(child: CircularProgressIndicator()),
-      ),    
+        ):Center(child: CircularProgressIndicator(
+          
+        )     
+        )
+        ),    
     );
   }
 }
